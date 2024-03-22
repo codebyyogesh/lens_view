@@ -2,14 +2,28 @@ package main
 
 import (
 	"fmt"
+	"html/template"
+	"log"
 	"net/http"
+	"path/filepath"
 
 	"github.com/go-chi/chi/v5"
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "<h1>Welcome to my awesome site!</h1>")
+	tplPath := filepath.Join("assets", "templates", "pages", "home.tmpl")
+	tpl, err := template.ParseFiles(tplPath)
+	if err != nil {
+		log.Printf("template parsing error: %v", err)
+		http.Error(w, "Error in template parsing", http.StatusInternalServerError)
+		return
+	}
+	err = tpl.Execute(w, nil)
+	if err != nil {
+		log.Printf("template executing error: %v", err)
+		http.Error(w, "Error in template executing", http.StatusInternalServerError)
+	}
 }
 
 func contactHandler(w http.ResponseWriter, r *http.Request) {
