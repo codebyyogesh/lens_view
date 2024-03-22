@@ -10,25 +10,29 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
+func parseAndExecuteTemplate(w http.ResponseWriter, tplPath string, data any) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	tplPath := filepath.Join("assets", "templates", "pages", "home.tmpl")
 	tpl, err := template.ParseFiles(tplPath)
 	if err != nil {
 		log.Printf("template parsing error: %v", err)
 		http.Error(w, "Error in template parsing", http.StatusInternalServerError)
 		return
 	}
-	err = tpl.Execute(w, nil)
+	err = tpl.Execute(w, data)
 	if err != nil {
 		log.Printf("template executing error: %v", err)
 		http.Error(w, "Error in template executing", http.StatusInternalServerError)
 	}
 }
 
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	tplPath := filepath.Join("assets", "templates", "pages", "home.tmpl")
+	parseAndExecuteTemplate(w, tplPath, nil)
+}
+
 func contactHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "<h1>Contact Page</h1><p>To get in touch, email me at <a href=\"mailto:yogidk@gmail.com\">yogidk@gmail</a>!</p>") // nolint:forbidh
+	tplPath := filepath.Join("assets", "templates", "pages", "contact.tmpl")
+	parseAndExecuteTemplate(w, tplPath, nil)
 }
 
 func faqHandler(w http.ResponseWriter, r *http.Request) {
