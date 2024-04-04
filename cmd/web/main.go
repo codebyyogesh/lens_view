@@ -2,27 +2,22 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
 
+	"github.com/codebyyogesh/lens_view/internal/views"
 	"github.com/go-chi/chi/v5"
 )
 
 func parseAndExecuteTemplate(w http.ResponseWriter, tplPath string, data any) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	tpl, err := template.ParseFiles(tplPath)
+	tpl, err := views.Parse(tplPath)
 	if err != nil {
 		log.Printf("template parsing error: %v", err)
 		http.Error(w, "Error in template parsing", http.StatusInternalServerError)
 		return
 	}
-	err = tpl.Execute(w, data)
-	if err != nil {
-		log.Printf("template executing error: %v", err)
-		http.Error(w, "Error in template executing", http.StatusInternalServerError)
-	}
+	tpl.Execute(w, data)
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
