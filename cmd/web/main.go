@@ -13,24 +13,16 @@ import (
 func main() {
 	mux := chi.NewRouter()
 	// home handler, first parse and then execute
-	tpl, err := views.Parse(filepath.Join("assets", "templates", "pages", "home.tmpl"))
-	if err != nil {
-		panic(err)
-	}
+	// Must() already handles the panic during the start
+	tpl := views.Must(views.Parse(filepath.Join("assets", "templates", "pages", "home.tmpl")))
 	mux.Get("/", actions.StaticHandler(tpl))
 
 	// contact handler, first parse and then execute
-	tpl, err = views.Parse(filepath.Join("assets", "templates", "pages", "contact.tmpl"))
-	if err != nil {
-		panic(err)
-	}
+	tpl = views.Must(views.Parse(filepath.Join("assets", "templates", "pages", "contact.tmpl")))
 	mux.Get("/contact", actions.StaticHandler(tpl))
 
 	// faq handler, first parse and then execute
-	tpl, err = views.Parse(filepath.Join("assets", "templates", "pages", "faq.tmpl"))
-	if err != nil {
-		panic(err)
-	}
+	tpl = views.Must(views.Parse(filepath.Join("assets", "templates", "pages", "faq.tmpl")))
 	mux.Get("/faq", actions.StaticHandler(tpl))
 
 	mux.NotFound(func(w http.ResponseWriter, r *http.Request) { http.Error(w, "Page not found", http.StatusNotFound) })
