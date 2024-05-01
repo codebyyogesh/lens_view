@@ -18,8 +18,8 @@ func Must(tpl Template, err error) Template {
 // Use ParseFS instead of Parse() so that it embeds the templates(tmpl files) into
 // the final binary. Parse() cannot handle the case of running the app from a different
 // directory due to relative paths of the template files
-func ParseFS(fs fs.FS, patterns string) (Template, error) {
-	tpl, err := template.ParseFS(fs, patterns)
+func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
+	tpl, err := template.ParseFS(fs, patterns...)
 	if err != nil {
 		return Template{}, fmt.Errorf("parseFS template: %w", err)
 	}
