@@ -15,15 +15,22 @@ func main() {
 	mux := chi.NewRouter()
 	// home handler, first parse and then execute
 	// Must() already handles the panic during the start
-	tpl := views.Must(views.ParseFS(assets.EmbeddedFiles, "templates/pages/home.tmpl"))
+	tpl := views.Must(views.ParseFS(assets.EmbeddedFiles,
+		"templates/pages/home.tmpl",
+		"templates/pages/tailwind.tmpl"))
+
 	mux.Get("/", actions.StaticHandler(tpl))
 
 	// contact handler, first parse and then execute
-	tpl = views.Must(views.ParseFS(assets.EmbeddedFiles, "templates/pages/contact.tmpl"))
+	tpl = views.Must(views.ParseFS(assets.EmbeddedFiles,
+		"templates/pages/contact.tmpl",
+		"templates/pages/tailwind.tmpl"))
 	mux.Get("/contact", actions.StaticHandler(tpl))
 
 	// faq handler, first parse and then execute
-	tpl = views.Must(views.ParseFS(assets.EmbeddedFiles, "templates/pages/faq.tmpl"))
+	tpl = views.Must(views.ParseFS(assets.EmbeddedFiles,
+		"templates/pages/faq.tmpl",
+		"templates/pages/tailwind.tmpl"))
 	mux.Get("/faq", actions.FAQ(tpl))
 
 	mux.NotFound(func(w http.ResponseWriter, r *http.Request) { http.Error(w, "Page not found", http.StatusNotFound) })
