@@ -33,6 +33,12 @@ func main() {
 		"templates/pages/tailwind.tmpl"))
 	mux.Get("/faq", actions.FAQ(tpl))
 
+	// contact handler, first parse and then execute
+	tpl = views.Must(views.ParseFS(assets.EmbeddedFiles,
+		"templates/pages/signup.tmpl",
+		"templates/pages/tailwind.tmpl"))
+	mux.Get("/signup", actions.StaticHandler(tpl))
+
 	mux.NotFound(func(w http.ResponseWriter, r *http.Request) { http.Error(w, "Page not found", http.StatusNotFound) })
 	fmt.Println("Server listening on port :4444")
 	http.ListenAndServe(":4444", mux)
