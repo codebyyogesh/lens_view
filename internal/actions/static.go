@@ -6,18 +6,16 @@ package actions
 import (
 	"html/template"
 	"net/http"
-
-	"github.com/codebyyogesh/lens_view/internal/views"
 )
 
-func StaticHandler(t views.Template) http.HandlerFunc {
+func StaticHandler(t Template) http.HandlerFunc {
 	// we return a closure
 	return func(w http.ResponseWriter, r *http.Request) {
 		t.Execute(w, nil)
 	}
 }
 
-func FAQ(t views.Template) http.HandlerFunc {
+func FAQ(t Template) http.HandlerFunc {
 	questions := []struct {
 		Question string
 		Answer   template.HTML
