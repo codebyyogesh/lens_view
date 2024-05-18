@@ -42,8 +42,9 @@ type Template struct {
 	htmlTpl *template.Template
 }
 
+// Execute implements actions.Template.
 // receivers
-func (t *Template) Execute(w http.ResponseWriter, data any) {
+func (t Template) Execute(w http.ResponseWriter, data any) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	err := t.htmlTpl.Execute(w, data)
 	if err != nil {
