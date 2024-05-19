@@ -15,6 +15,7 @@ func main() {
 	mux := chi.NewRouter()
 	// home handler, first parse and then execute
 	// Must() already handles the panic during the start
+	// Register your API route handlers of mux using Get, Post, Put and Delete methods
 	tpl := views.Must(views.ParseFS(assets.EmbeddedFiles,
 		"templates/pages/home.tmpl",
 		"templates/pages/tailwind.tmpl"))
@@ -40,6 +41,8 @@ func main() {
 		"templates/pages/tailwind.tmpl"))
 
 	mux.Get("/signup", userSignUp.NewHandler)
+	// POST API route handler for form /signup
+	mux.Post("/signup", userSignUp.Create)
 
 	mux.NotFound(func(w http.ResponseWriter, r *http.Request) { http.Error(w, "Page not found", http.StatusNotFound) })
 	fmt.Println("Server listening on port :4444")
