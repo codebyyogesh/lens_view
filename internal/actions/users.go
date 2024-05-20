@@ -10,7 +10,13 @@ type Users struct {
 }
 
 func (u Users) NewHandler(w http.ResponseWriter, r *http.Request) {
-	u.New.Execute(w, nil)
+	// anonymous struct
+	data := struct {
+		Email string
+	}{
+		Email: r.FormValue("email"),
+	}
+	u.New.Execute(w, data)
 }
 
 func (u Users) Create(w http.ResponseWriter, r *http.Request) {

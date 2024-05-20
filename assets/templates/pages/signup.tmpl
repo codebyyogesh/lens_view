@@ -19,6 +19,14 @@
             required
             autocomplete="email"
             class="w-full px-4 py-1 border border-gray-300 placeholder-gray-500 text-gray-800 rounded focus:shadow-outline"
+            value="{{.Email}}"
+            {{
+            if
+            not
+            .Email
+            }}
+            autofocus
+            {{end}}
           />
         </div>
 
@@ -33,6 +41,12 @@
             placeholder="password"
             required
             class="w-full px-4 py-1 border border-gray-300 placeholder-gray-500 text-gray-800 rounded focus:shadow-outline"
+            {{
+            if
+            .Email
+            }}
+            autofocus
+            {{end}}
           />
         </div>
 
