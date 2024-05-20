@@ -1,38 +1,61 @@
 {{define "header"}}
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
 
-<body class="flex flex-col min-h-screen bg-gray-100">
+  <body class="flex flex-col min-h-screen bg-gray-100">
+    <header
+      class="font-serif bg-gradient-to-r from-purple-700 to-pink-500 text-white"
+    >
+      <nav class="px-8 py-4 flex items-center justify-between">
+        <div class="text-2xl">LensView 📷</div>
+        <div>
+          <a class="text-lg font-semibold hover:text-blue-100 px-2" href="/"
+            >Home</a
+          >
+          <a
+            class="text-lg font-semibold hover:text-blue-100 px-2"
+            href="/contact"
+            >Contact</a
+          >
+          <a class="text-lg font-semibold hover:text-blue-100 px-2" href="/faq"
+            >FAQ</a
+          >
+        </div>
+        <div>
+          <a class="pr-4" href="/#">Sign In</a>
+          <a
+            class="px-2 py-1 bg-blue-500 rounded hover:bg-blue-600"
+            href="/signup"
+            >Sign Up</a
+          >
+        </div>
+      </nav>
+    </header>
+    {{ end }}
 
-  <header class="font-serif bg-gradient-to-r from-purple-700 to-pink-500  text-white">
-    <nav class="px-8 py-4 flex items-center justify-between ">
-      <div class="text-2xl">LensView 📷  </div>
-      <div>
-        <a class="text-lg font-semibold hover:text-blue-100 px-2" href="/">Home</a>
-        <a class="text-lg font-semibold hover:text-blue-100 px-2" href="/contact">Contact</a>
-        <a class="text-lg font-semibold hover:text-blue-100 px-2" href="/faq">FAQ</a>
+    <!-- All pages come here -->
+
+    {{define "footer"}}
+    <footer class="mt-auto font-serif bg-blue-500 text-white">
+      <div class="text-xs text-center hover:text-blue-100 px-2">
+        <p>
+          Copyright &copy;
+          <script>
+            document.write(/\d{4}/.exec(Date())[0])
+          </script>
+          TimeWiseSolutions.All rights reserved.
+          (support@timewisesolutions.com.au)
+        </p>
       </div>
-      <div>
-        <a class="pr-4" href="/#">Sign In</a>
-        <a class="px-2 py-1 bg-blue-500 rounded hover:bg-blue-600" href="/signup">Sign Up</a>
-      </div>
-    </nav>
-  </header>
-{{end}}
-
-<!-- All pages come here -->
-
-{{define "footer"}}
-  <footer class="mt-auto font-serif bg-blue-500 text-white">
-    <div class="text-xs text-center  hover:text-blue-100 px-2">
-            <p>Copyright &copy;  <script>document.write(/\d{4}/.exec(Date())[0])</script> TimeWiseSolutions.All rights reserved. (support@timewisesolutions.com.au) </p>
-    </div>
-  </footer>
-</body>
+    </footer>
+  </body>
 </html>
-{{end}}
+{{ end }}
