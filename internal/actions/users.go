@@ -3,10 +3,13 @@ package actions
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/codebyyogesh/lens_view/internal/database"
 )
 
 type Users struct {
-	New Template
+	New       Template
+	UserStore *database.UserStore
 }
 
 // Renders the signup Page (ie. GET /signup)

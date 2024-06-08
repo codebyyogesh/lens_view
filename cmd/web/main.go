@@ -6,6 +6,7 @@ import (
 
 	"github.com/codebyyogesh/lens_view/assets"
 	"github.com/codebyyogesh/lens_view/internal/actions"
+	"github.com/codebyyogesh/lens_view/internal/database"
 	"github.com/codebyyogesh/lens_view/internal/views"
 
 	"github.com/go-chi/chi/v5"
@@ -34,8 +35,22 @@ func main() {
 		"templates/pages/tailwind.tmpl"))
 	mux.Get("/faq", actions.FAQ(tpl))
 
+	// Setup the DB connection
+	cfg := database.DefaultPostgresConfig()
+	db, err := database.Open(cfg)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	// setup the db(db acts here as a model of mvc pattern) store
+	userStore := database.UserStore{
+		DB: db,
+	}
+
 	// contact handler, first parse and then execute
-	userSignUp := actions.Users{}
+	userSignUp := actions.Users{
+		UserStore: &userStore,
+	}
 	userSignUp.New = views.Must(views.ParseFS(assets.EmbeddedFiles,
 		"templates/pages/signup.tmpl",
 		"templates/pages/tailwind.tmpl"))
