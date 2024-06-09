@@ -48,16 +48,25 @@ func main() {
 	}
 
 	// contact handler, first parse and then execute
-	userSignUp := actions.Users{
+	user := actions.Users{
 		UserStore: &userStore,
 	}
-	userSignUp.New = views.Must(views.ParseFS(assets.EmbeddedFiles,
+
+	// SignUp Page creation
+	user.New = views.Must(views.ParseFS(assets.EmbeddedFiles,
 		"templates/pages/signup.tmpl",
 		"templates/pages/tailwind.tmpl"))
 
-	mux.Get("/signup", userSignUp.NewHandler)
+	mux.Get("/signup", user.NewHandler)
 	// POST API route handler for form /signup
-	mux.Post("/signup", userSignUp.Create)
+	mux.Post("/signup", user.Create)
+
+	// SignIn Page Creation
+	user.SignIn = views.Must(views.ParseFS(assets.EmbeddedFiles,
+		"templates/pages/signin.tmpl",
+		"templates/pages/tailwind.tmpl"))
+
+	mux.Get("/signin", user.SignInHandler)
 
 	mux.NotFound(func(w http.ResponseWriter, r *http.Request) { http.Error(w, "Page not found", http.StatusNotFound) })
 	fmt.Println("Server listening on port :4444")

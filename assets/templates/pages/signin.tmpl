@@ -1,0 +1,77 @@
+{{template "header" .}}
+
+<form action="/signin" method="POST">
+  <div class="py-12 flex justify-center items-center">
+    <div class="px-8 py-8 bg-white rounded shadow font-serif">
+      <h1 class="pt-4 pb-8 text-center text-xl font-bold text-gray-800">
+        Welcome back!
+      </h1>
+      <div class="space-y-4">
+        <div>
+          <label for="email" class="text-sm font-semibold text-gray-800"
+            >Email Address</label
+          >
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="email@example.com"
+            required
+            autocomplete="email"
+            class="w-full px-4 py-1 border border-gray-300 placeholder-gray-500 text-gray-800 rounded focus:shadow-outline"
+            value="{{.Email}}"
+            {{
+            if
+            not
+            .Email
+            }}
+            autofocus
+            {{end}}
+          />
+        </div>
+
+        <div>
+          <label for="password" class="text-sm font-semibold text-gray-800"
+            >Password</label
+          >
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder="password"
+            required
+            class="w-full px-4 py-1 border border-gray-300 placeholder-gray-500 text-gray-800 rounded focus:shadow-outline"
+            {{
+            if
+            .Email
+            }}
+            autofocus
+            {{end}}
+          />
+        </div>
+
+        <div>
+          <button
+            type="submit"
+            class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded focus:shadow-outline font-bold text-lg"
+          >
+            Sign In
+          </button>
+        </div>
+
+        <div class="w-full flex justify-between">
+          <p class="text-xs text-gray-500">
+            Need an account?
+            <a href="/signup" class="underline">Sign Up</a>
+          </p>
+
+          <p class="text-xs text-gray-500">
+            <a href="/reset-pw" class="underline">Forgot your password? </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+{{template "footer" .}}

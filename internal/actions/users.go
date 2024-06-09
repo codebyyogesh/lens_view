@@ -9,6 +9,7 @@ import (
 
 type Users struct {
 	New       Template
+	SignIn    Template
 	UserStore *database.UserStore
 }
 
@@ -39,4 +40,20 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, "User created: %+v\n", user)
+}
+
+// user sign in handler (ie. GET /signin)
+func (u Users) SignInHandler(w http.ResponseWriter, r *http.Request) {
+	// anonymous struct
+	// This is used to pre fill data in the sign in page
+	// ie when you type in the browser http://localhost:4444/signin?email=bi@bi.io
+	// email was already pre filled and this data is passed to the signin template
+	//page before rendering it
+	data := struct {
+		Email string
+	}{
+		Email: r.FormValue("email"),
+	}
+	u.SignIn.Execute(w, data)
+
 }
