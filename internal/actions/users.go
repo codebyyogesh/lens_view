@@ -29,6 +29,14 @@ func (u Users) NewHandler(w http.ResponseWriter, r *http.Request) {
 
 // This gets called when the signup form is filled and submitted (ie.e POST /signup)
 func (u Users) Create(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Email:  %v\n", r.FormValue("email"))
-	fmt.Fprintf(w, "Password:  %v\n", r.FormValue("password"))
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+
+	user, err := u.UserStore.Create(email, password)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Something went wrong:", http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintf(w, "User created: %+v\n", user)
 }
