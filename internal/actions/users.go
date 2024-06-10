@@ -8,8 +8,11 @@ import (
 )
 
 type Users struct {
-	New       Template
-	SignIn    Template
+	// club all templates in an anonymous struct
+	Templates struct {
+		New    Template
+		SignIn Template
+	}
 	UserStore *database.UserStore
 }
 
@@ -25,7 +28,7 @@ func (u Users) NewHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		Email: r.FormValue("email"),
 	}
-	u.New.Execute(w, data)
+	u.Templates.New.Execute(w, data)
 }
 
 // This gets called when the signup form is filled and submitted (ie.e POST /signup)
@@ -54,6 +57,6 @@ func (u Users) SignInHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		Email: r.FormValue("email"),
 	}
-	u.SignIn.Execute(w, data)
+	u.Templates.SignIn.Execute(w, data)
 
 }

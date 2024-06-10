@@ -53,7 +53,7 @@ func main() {
 	}
 
 	// SignUp Page creation
-	user.New = views.Must(views.ParseFS(assets.EmbeddedFiles,
+	user.Templates.New = views.Must(views.ParseFS(assets.EmbeddedFiles,
 		"templates/pages/signup.tmpl",
 		"templates/pages/tailwind.tmpl"))
 
@@ -62,7 +62,7 @@ func main() {
 	mux.Post("/signup", user.Create)
 
 	// SignIn Page Creation
-	user.SignIn = views.Must(views.ParseFS(assets.EmbeddedFiles,
+	user.Templates.SignIn = views.Must(views.ParseFS(assets.EmbeddedFiles,
 		"templates/pages/signin.tmpl",
 		"templates/pages/tailwind.tmpl"))
 
