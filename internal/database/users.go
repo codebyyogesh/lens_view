@@ -14,8 +14,11 @@ type User struct {
 	PasswordHash string
 }
 
+// As of now this interface is not so much useful.
+// But maybe it will be useful in the future
 type UserCreator interface {
 	Create(email, password string) (*User, error)
+	Authenticate(email, password string) (*User, error)
 }
 type UserStore struct {
 	DB *sql.DB

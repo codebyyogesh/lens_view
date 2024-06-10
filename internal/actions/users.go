@@ -58,5 +58,23 @@ func (u Users) SignInHandler(w http.ResponseWriter, r *http.Request) {
 		Email: r.FormValue("email"),
 	}
 	u.Templates.SignIn.Execute(w, data)
+}
 
+// This gets called when the signin form is filled and submitted (ie. POST /signin)
+func (u Users) ProcessSignInHandler(w http.ResponseWriter, r *http.Request) {
+	// anonymous struct for convenience
+	data := struct {
+		Email    string
+		Password string
+	}{
+		Email:    r.FormValue("email"),
+		Password: r.FormValue("password"),
+	}
+	user, err := u.UserStore.Authenticate(data.Email, data.Password)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Something went wrong:", http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintf(w, "User authenticated: %+v\n", user)
 }
