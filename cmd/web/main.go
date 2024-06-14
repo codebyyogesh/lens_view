@@ -69,6 +69,7 @@ func main() {
 	mux.Get("/signin", user.SignInHandler)
 	mux.Post("/signin", user.ProcessSignInHandler)
 
+	mux.Get("/users/me", user.CurrentUser)
 	mux.NotFound(func(w http.ResponseWriter, r *http.Request) { http.Error(w, "Page not found", http.StatusNotFound) })
 	fmt.Println("Server listening on port :4444")
 	http.ListenAndServe(":4444", mux)
