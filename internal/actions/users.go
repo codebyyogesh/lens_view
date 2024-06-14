@@ -78,9 +78,10 @@ func (u Users) ProcessSignInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// add a cookie
 	cookie := http.Cookie{
-		Name:  "email",
-		Value: user.Email,
-		Path:  "/", // ie this cookie is accesible at all paths
+		Name:     "email",
+		Value:    user.Email,
+		Path:     "/",  // ie this cookie is accesible at all paths
+		HttpOnly: true, // protect cookies from XSS using Javascript
 	}
 
 	http.SetCookie(w, &cookie)
