@@ -9,6 +9,8 @@ import (
 	"github.com/codebyyogesh/lens_view/internal/database"
 	"github.com/codebyyogesh/lens_view/internal/views"
 
+	"github.com/gorilla/csrf"
+
 	"github.com/go-chi/chi/v5"
 )
 
@@ -72,5 +74,11 @@ func main() {
 	mux.Get("/users/me", user.CurrentUser)
 	mux.NotFound(func(w http.ResponseWriter, r *http.Request) { http.Error(w, "Page not found", http.StatusNotFound) })
 	fmt.Println("Server listening on port :4444")
-	http.ListenAndServe(":4444", mux)
+	csrfKey := "8jRMm5SZweHXO0ngTy80E7uG7t0hO6LX"
+	csrfMiddleware := csrf.Protect(
+		[]byte(csrfKey),
+		csrf.Secure(false), //ToDO: Fix this before deploying
+	)
+
+	http.ListenAndServe(":4444", csrfMiddleware(mux))
 }
