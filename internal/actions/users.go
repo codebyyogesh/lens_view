@@ -2,11 +2,9 @@ package actions
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 
 	"github.com/codebyyogesh/lens_view/internal/database"
-	"github.com/gorilla/csrf"
 )
 
 type Users struct {
@@ -26,11 +24,9 @@ func (u Users) NewHandler(w http.ResponseWriter, r *http.Request) {
 	// email was already pre filled and this data is passed to the signup template
 	//page before rendering it
 	data := struct {
-		Email     string
-		CSRFField template.HTML
+		Email string
 	}{
-		Email:     r.FormValue("email"),
-		CSRFField: csrf.TemplateField(r),
+		Email: r.FormValue("email"),
 	}
 	u.Templates.New.Execute(w, data)
 }

@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"path/filepath"
 )
 
 func Must(tpl Template, err error) Template {
@@ -18,11 +19,27 @@ func Must(tpl Template, err error) Template {
 	return tpl
 }
 
+func csrfField() template.HTML {
+	return template.HTML(`<input type="hidden" />`)
+}
+
 // Use ParseFS instead of Parse() so that it embeds the templates(tmpl files) into
 // the final binary. Parse() cannot handle the case of running the app from a different
 // directory due to relative paths of the template files
 func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
-	tpl, err := template.ParseFS(fs, patterns...)
+	// because our tmpl files are in the templates/pages folder, we need to
+	// use filepath.Base(patterns[0]) to get the name of the tmpl file, else it gives
+	// an error
+	filename := filepath.Base(patterns[0])
+
+	tpl := template.New(filename)
+	tpl = tpl.Funcs(
+		template.FuncMap{
+			"csrfField": csrfField,
+		},
+	)
+
+	tpl, err := tpl.ParseFS(fs, patterns...)
 	if err != nil {
 		return Template{}, fmt.Errorf("parseFS template: %w", err)
 	}
