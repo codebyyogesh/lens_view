@@ -28,7 +28,7 @@ func (u Users) NewHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		Email: r.FormValue("email"),
 	}
-	u.Templates.New.Execute(w, data)
+	u.Templates.New.Execute(w, r, data)
 }
 
 // This gets called when the signup form is filled and submitted (ie.e POST /signup)
@@ -57,7 +57,7 @@ func (u Users) SignInHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		Email: r.FormValue("email"),
 	}
-	u.Templates.SignIn.Execute(w, data)
+	u.Templates.SignIn.Execute(w, r, data)
 }
 
 // This gets called when the signin form is filled and submitted (ie. POST /signin)

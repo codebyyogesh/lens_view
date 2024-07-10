@@ -11,7 +11,7 @@ import (
 func StaticHandler(t Template) http.HandlerFunc {
 	// we return a closure
 	return func(w http.ResponseWriter, r *http.Request) {
-		t.Execute(w, nil)
+		t.Execute(w, r, nil)
 	}
 }
 
@@ -42,6 +42,6 @@ func FAQ(t Template) http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		t.Execute(w, questions)
+		t.Execute(w, r, questions)
 	}
 }
