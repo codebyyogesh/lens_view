@@ -1,6 +1,10 @@
 {{template "header" .}}
 
 <form action="/signin" method="POST">
+  <div class="hidden">
+    {{ csrfField }}
+  </div>
+
   <div class="py-12 flex justify-center items-center">
     <div class="px-8 py-8 bg-white rounded shadow font-serif">
       <h1 class="pt-4 pb-8 text-center text-xl font-bold text-gray-800">

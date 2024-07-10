@@ -10,6 +10,8 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"github.com/gorilla/csrf"
 )
 
 func Must(tpl Template, err error) Template {
@@ -20,7 +22,7 @@ func Must(tpl Template, err error) Template {
 }
 
 func csrfField() template.HTML {
-	return template.HTML(`<input type="hidden" />`)
+	return `<-!-- TODO: add csrf field -->`
 }
 
 // Use ParseFS instead of Parse() so that it embeds the templates(tmpl files) into
@@ -35,7 +37,7 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 	tpl := template.New(filename)
 	tpl = tpl.Funcs(
 		template.FuncMap{
-			"csrfField": csrfField,
+			"csrfField": csrfField, // just a placeholder function for now for parsing. It will be overridden later in Execute
 		},
 	)
 
@@ -53,8 +55,24 @@ type Template struct {
 // Execute implements actions.Template.
 // receivers
 func (t Template) Execute(w http.ResponseWriter, r *http.Request, data any) {
+
+	//Concurrent web requests in separate goroutines(created by net/http for every web request a goroutine is created) can cause incorrect CSRF tokens due to shared templates. Cloning the template before adding request-specific functions prevents this issue.
+	tpl, err := t.htmlTpl.Clone()
+	if err != nil {
+		log.Printf("template cloning error: %v", err)
+		http.Error(w, "There was an error rendering page.", http.StatusInternalServerError)
+		return
+	}
+
+	// Add custom functions to tpl, creating a new template instance
+	tpl = tpl.Funcs(template.FuncMap{
+		"csrfField": func() template.HTML {
+			return csrf.TemplateField(r) // We use the anonymous function to pass in the template's functions so that we do not have to pass http.Request as a param in every function such as csrfField()
+		},
+	})
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err := t.htmlTpl.Execute(w, data)
+	// Execute the modified template (tpl), not the original one (t.htmlTpl)
+	err = tpl.Execute(w, data)
 	if err != nil {
 		log.Printf("template executing error: %v", err)
 		http.Error(w, "Error in template executing", http.StatusInternalServerError)
