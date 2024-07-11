@@ -4,8 +4,10 @@ Views generates a user interface for the user. Views are created by the data whi
 package views
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
+	"io"
 	"io/fs"
 	"log"
 	"net/http"
@@ -21,8 +23,8 @@ func Must(tpl Template, err error) Template {
 	return tpl
 }
 
-func csrfField() template.HTML {
-	return `<-!-- TODO: add csrf field -->`
+func csrfField() (template.HTML, error) {
+	return "", fmt.Errorf("csrfField not implemented")
 }
 
 // Use ParseFS instead of Parse() so that it embeds the templates(tmpl files) into
@@ -72,9 +74,15 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data any) {
 	})
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	// Execute the modified template (tpl), not the original one (t.htmlTpl)
-	err = tpl.Execute(w, data)
+	// To get a proper http.Error response if there is an error we use an in memory buffer, otherwise we get the error as - http: superfluous response.WriteHeader call from views.Template.Execute which may not reflect the correct error condition
+	// PS: If the html page rendered is big, then do not use buffer, rather directly use w instead of buf, ie tpl.Execute(w, data), in such a case the http.Error will not be properly handled, but the performance will be much better
+	var buf bytes.Buffer
+
+	err = tpl.Execute(&buf, data)
 	if err != nil {
 		log.Printf("template executing error: %v", err)
 		http.Error(w, "Error in template executing", http.StatusInternalServerError)
+		return
 	}
+	io.Copy(w, &buf)
 }
