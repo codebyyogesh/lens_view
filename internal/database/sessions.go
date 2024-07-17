@@ -1,0 +1,7 @@
+package database
+
+type Session struct {
+	ID        int
+	UserID    int
+	TokenHash string
+}
