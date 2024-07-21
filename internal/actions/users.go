@@ -13,7 +13,8 @@ type Users struct {
 		New    Template
 		SignIn Template
 	}
-	UserStore *database.UserStore
+	UserStore    *database.UserStore
+	SessionStore *database.SessionStore
 }
 
 // Renders the signup Page (ie. GET /signup)
@@ -42,7 +43,24 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Something went wrong:", http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprintf(w, "User created: %+v\n", user)
+
+	// Create a new session for the user
+	session, err := u.SessionStore.Create(user.ID)
+	if err != nil {
+		fmt.Println(err)
+		// TODO: Warn the user about not being able to sign the user in , but user signup was successful
+		http.Redirect(w, r, "/signin", http.StatusFound) // redirect to /signin
+		return
+	}
+
+	cookie := http.Cookie{
+		Name:     "session",
+		Value:    session.Token,
+		Path:     "/",
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
+	http.Redirect(w, r, "/users/me", http.StatusFound)
 }
 
 // user sign in handler (ie. GET /signin)
@@ -76,25 +94,41 @@ func (u Users) ProcessSignInHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Something went wrong:", http.StatusInternalServerError)
 		return
 	}
+	// create a session
+	session, err := u.SessionStore.Create(user.ID)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Something went wrong:", http.StatusInternalServerError)
+		return
+	}
 	// add a cookie
 	cookie := http.Cookie{
-		Name:     "email",
-		Value:    user.Email,
+		Name:     "session",
+		Value:    session.Token,
 		Path:     "/",  // ie this cookie is accesible at all paths
 		HttpOnly: true, // protect cookies from XSS using Javascript
 	}
 
 	http.SetCookie(w, &cookie)
 
-	fmt.Fprintf(w, "User authenticated: %+v\n", user)
+	http.Redirect(w, r, "/users/me", http.StatusFound)
 }
 
+// This gets called for GET /users/me ie know your current user
 func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
-	email, err := r.Cookie("email")
+	tokenCookie, err := r.Cookie("session")
 	if err != nil {
-		fmt.Fprint(w, "the email cookie could not be read")
+		fmt.Println(err)
+		http.Redirect(w, r, "/signin", http.StatusFound)
 		return
 	}
-	fmt.Fprintf(w, "email cookie: %s\n", email.Value)
-	fmt.Fprintf(w, "Headers: %+v\n", r.Header)
+	// Get the user from the session using tokenCookie
+	user, err := u.SessionStore.UserLookup(tokenCookie.Value)
+	if err != nil {
+		fmt.Println(err)
+		http.Redirect(w, r, "/signin", http.StatusFound)
+		return
+	}
+
+	fmt.Fprintf(w, "Current User: %s\n ", user.Email)
 }
