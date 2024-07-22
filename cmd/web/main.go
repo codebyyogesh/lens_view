@@ -48,10 +48,13 @@ func main() {
 	userStore := database.UserStore{
 		DB: db,
 	}
-
+	sessionStore := database.SessionStore{
+		DB: db,
+	}
 	// contact handler, first parse and then execute
 	user := actions.Users{
-		UserStore: &userStore,
+		UserStore:    &userStore,
+		SessionStore: &sessionStore,
 	}
 
 	// SignUp Page creation

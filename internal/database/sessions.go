@@ -1,6 +1,11 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+
+	"github.com/codebyyogesh/lens_view/internal/rand"
+)
 
 type Session struct {
 	ID        int
@@ -22,8 +27,19 @@ type NewSession struct {
 
 func (ss *SessionStore) Create(userID int) (*NewSession, error) {
 	// TODO: Create the session token
+	token, err := rand.SessionToken()
+	if err != nil {
+		return nil, fmt.Errorf("create: %w", err)
+	}
+	session := NewSession{
+		NEWSession: Session{
+			UserID: userID,
+		},
+		Token: token,
+	}
+	// TODO: Hash the session token
 	// TODO: Implement SessionService.Create
-	return nil, nil
+	return &session, nil
 }
 
 // Once a session is created we will need a way to query our SessionStore to determine who the user is with that session.
