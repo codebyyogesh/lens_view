@@ -52,14 +52,8 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/signin", http.StatusFound) // redirect to /signin
 		return
 	}
-
-	cookie := http.Cookie{
-		Name:     "session",
-		Value:    session.Token,
-		Path:     "/",
-		HttpOnly: true,
-	}
-	http.SetCookie(w, &cookie)
+	// Set the session cookie
+	setCookie(w, CookieSession, session.Token)
 	http.Redirect(w, r, "/users/me", http.StatusFound)
 }
 
@@ -101,29 +95,21 @@ func (u Users) ProcessSignInHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Something went wrong:", http.StatusInternalServerError)
 		return
 	}
-	// add a cookie
-	cookie := http.Cookie{
-		Name:     "session",
-		Value:    session.Token,
-		Path:     "/",  // ie this cookie is accesible at all paths
-		HttpOnly: true, // protect cookies from XSS using Javascript
-	}
-
-	http.SetCookie(w, &cookie)
-
+	// set a session cookie
+	setCookie(w, CookieSession, session.Token)
 	http.Redirect(w, r, "/users/me", http.StatusFound)
 }
 
 // This gets called for GET /users/me ie know your current user
 func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
-	tokenCookie, err := r.Cookie("session")
+	token, err := readCookie(r, CookieSession)
 	if err != nil {
 		fmt.Println(err)
 		http.Redirect(w, r, "/signin", http.StatusFound)
 		return
 	}
 	// Get the user from the session using tokenCookie
-	user, err := u.SessionStore.UserLookup(tokenCookie.Value)
+	user, err := u.SessionStore.UserLookup(token)
 	if err != nil {
 		fmt.Println(err)
 		http.Redirect(w, r, "/signin", http.StatusFound)
