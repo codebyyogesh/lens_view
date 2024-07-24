@@ -15,6 +15,8 @@ type Session struct {
 
 type SessionStore struct {
 	DB *sql.DB
+	//SessionBytesPerToken sets the length of generated session tokens. If unset or too small, the minimum length (MinSessionBytesPerToken) is used.
+	SessionBytesPerToken int
 }
 
 type NewSession struct {
@@ -23,11 +25,20 @@ type NewSession struct {
 	Token string
 }
 
+const (
+	// min bytes for each session token
+	MinSessionBytesPerToken = 32
+)
+
 //  We will both create the session token and hash it inside Create, then we could return the original session token from the Create method. Create will create a new session for the user provided. The session token will be returned as the Token field on the NEWSession type, but only the hashed session token is stored in the database.
 
 func (ss *SessionStore) Create(userID int) (*NewSession, error) {
 	// TODO: Create the session token
-	token, err := rand.SessionToken()
+	sessionBytesPerToken := ss.SessionBytesPerToken
+	if sessionBytesPerToken < MinSessionBytesPerToken {
+		sessionBytesPerToken = MinSessionBytesPerToken
+	}
+	token, err := rand.String(sessionBytesPerToken)
 	if err != nil {
 		return nil, fmt.Errorf("create: %w", err)
 	}
