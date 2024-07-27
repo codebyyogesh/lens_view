@@ -51,7 +51,14 @@ func (ss *SessionStore) Create(userID int) (*NewSession, error) {
 		},
 		Token: token,
 	}
-	// TODO: Store session info to db
+	row := ss.DB.QueryRow(`
+	INSERT INTO sessions (user_id, token_hash) 
+	VALUES ($1, $2) RETURNING id`, session.NEWSession.UserID, session.NEWSession.TokenHash)
+	// get the session ID
+	err = row.Scan(&session.NEWSession.ID)
+	if err != nil {
+		return nil, fmt.Errorf("create: %w", err)
+	}
 	return &session, nil
 }
 
