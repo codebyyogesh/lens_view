@@ -1,7 +1,9 @@
 package database
 
 import (
+	"crypto/sha256"
 	"database/sql"
+	"encoding/base64"
 	"fmt"
 
 	"github.com/codebyyogesh/lens_view/internal/rand"
@@ -44,12 +46,12 @@ func (ss *SessionStore) Create(userID int) (*NewSession, error) {
 	}
 	session := NewSession{
 		NEWSession: Session{
-			UserID: userID,
+			UserID:    userID,
+			TokenHash: ss.hash(token),
 		},
 		Token: token,
 	}
-	// TODO: Hash the session token
-	// TODO: Implement SessionService.Create
+	// TODO: Store session info to db
 	return &session, nil
 }
 
@@ -57,4 +59,9 @@ func (ss *SessionStore) Create(userID int) (*NewSession, error) {
 func (ss *SessionStore) UserLookup(token string) (*User, error) {
 	// TODO: Implement SessionService.UserLookup
 	return nil, nil
+}
+
+func (ss *SessionStore) hash(token string) string {
+	tokenHash := sha256.Sum256([]byte(token))
+	return base64.URLEncoding.EncodeToString(tokenHash[:]) //[:] needed because tokenHash is an array and not slice, [:] converts it into a slice
 }
