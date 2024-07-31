@@ -77,12 +77,6 @@ func (ss *SessionStore) Create(userID int) (*NewSession, error) {
 
 // Once a session is created we will need a way to query our SessionStore to determine who the user is with that session.
 func (ss *SessionStore) UserLookup(token string) (*User, error) {
-	// TODO: Steps
-	// 1. Hash the session token
-	// 2. Use the hash to Query the db for the session
-	// 3. Use the userID from the session to query the db for the user
-	// 4. Return the user
-
 	// 1. Hash the session token
 	tokenHash := ss.hash(token)
 
@@ -106,6 +100,19 @@ func (ss *SessionStore) UserLookup(token string) (*User, error) {
 	}
 	// 4. Return the user
 	return &user, nil
+}
+
+func (ss *SessionStore) Delete(token string) error {
+
+	tokenHash := ss.hash(token)
+	// Execute is used instead of QueryRow because we dont care for any data returned by the query
+	_, err := ss.DB.Exec(`
+		DELETE FROM sessions 
+		WHERE token_hash = $1`, tokenHash)
+	if err != nil {
+		return fmt.Errorf("delete: %w", err)
+	}
+	return nil
 }
 
 func (ss *SessionStore) hash(token string) string {
