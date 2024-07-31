@@ -51,11 +51,24 @@ func (ss *SessionStore) Create(userID int) (*NewSession, error) {
 		},
 		Token: token,
 	}
-	row := ss.DB.QueryRow(`
-	INSERT INTO sessions (user_id, token_hash) 
-	VALUES ($1, $2) RETURNING id`, session.NEWSession.UserID, session.NEWSession.TokenHash)
-	// get the session ID
+	// Avoid duplicate sessions getting created for the same userID as this ID is unique. E.g. Same user trying to login from difference devices. To solve this we presume that session exists for every user and then try to update it. If it doesn't exist we will create it. Benefit of this approach is we avoid querying the db frequently.
+
+	row := ss.DB.QueryRow(` 
+		UPDATE sessions 
+		SET token_hash = $2 
+		WHERE user_id = $1 
+		RETURNING id;`, session.NEWSession.UserID, session.NEWSession.TokenHash)
+	// get existing session id
 	err = row.Scan(&session.NEWSession.ID)
+	if err == sql.ErrNoRows {
+		// session does not exist, create it
+		row = ss.DB.QueryRow(`
+		INSERT INTO sessions (user_id, token_hash) 
+		VALUES ($1, $2) RETURNING id`, session.NEWSession.UserID, session.NEWSession.TokenHash)
+		// get the new session ID, error here will be overwritten by a new error or nil
+		err = row.Scan(&session.NEWSession.ID)
+	}
+	// if the error was not sql.ErrNoRows or other error due to new session creation, return the error
 	if err != nil {
 		return nil, fmt.Errorf("create: %w", err)
 	}
