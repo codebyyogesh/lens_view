@@ -77,8 +77,35 @@ func (ss *SessionStore) Create(userID int) (*NewSession, error) {
 
 // Once a session is created we will need a way to query our SessionStore to determine who the user is with that session.
 func (ss *SessionStore) UserLookup(token string) (*User, error) {
-	// TODO: Implement SessionService.UserLookup
-	return nil, nil
+	// TODO: Steps
+	// 1. Hash the session token
+	// 2. Use the hash to Query the db for the session
+	// 3. Use the userID from the session to query the db for the user
+	// 4. Return the user
+
+	// 1. Hash the session token
+	tokenHash := ss.hash(token)
+
+	// 2. Use the hash to Query the db for the session
+	var user User
+	row := ss.DB.QueryRow(`
+			SELECT user_id 
+			FROM sessions 
+			WHERE token_hash = $1`, tokenHash)
+	err := row.Scan(&user.ID)
+	if err != nil {
+		return nil, fmt.Errorf("user lookup: %w", err)
+	}
+	// 3. Use the userID from the session to query the db for the user
+	row = ss.DB.QueryRow(`
+			SELECT  email, password_hash
+			FROM users WHERE id = $1`, user.ID)
+	err = row.Scan(&user.Email, &user.PasswordHash)
+	if err != nil {
+		return nil, fmt.Errorf("user lookup: %w", err)
+	}
+	// 4. Return the user
+	return &user, nil
 }
 
 func (ss *SessionStore) hash(token string) string {
