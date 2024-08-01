@@ -100,6 +100,26 @@ func (u Users) ProcessSignInHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/users/me", http.StatusFound)
 }
 
+// Called when the user clicks signs out (ie. POST /signout)
+func (u Users) ProcessSignOutHandler(w http.ResponseWriter, r *http.Request) {
+	token, err := readCookie(r, CookieSession)
+	if err != nil {
+		fmt.Println(err)
+		http.Redirect(w, r, "/signin", http.StatusFound)
+		return
+	}
+	// delete the session for the user
+	err = u.SessionStore.Delete(token)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Something went wrong:", http.StatusInternalServerError)
+		return
+	}
+	// delete the session cookie as well
+	deleteCookie(w, CookieSession)
+	http.Redirect(w, r, "/signin", http.StatusFound)
+}
+
 // This gets called for GET /users/me ie know your current user
 func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
 	token, err := readCookie(r, CookieSession)

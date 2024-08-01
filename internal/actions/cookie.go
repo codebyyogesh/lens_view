@@ -31,3 +31,9 @@ func readCookie(r *http.Request, name string) (string, error) {
 	}
 	return c.Value, nil
 }
+
+func deleteCookie(w http.ResponseWriter, name string) {
+	cookie := newCookie(name, "")
+	cookie.MaxAge = -1 // -1 tells the browser that this cookie has expired and deletes it
+	http.SetCookie(w, cookie)
+}

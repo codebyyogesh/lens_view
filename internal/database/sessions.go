@@ -102,6 +102,7 @@ func (ss *SessionStore) UserLookup(token string) (*User, error) {
 	return &user, nil
 }
 
+// Delete the session associated with the provided token
 func (ss *SessionStore) Delete(token string) error {
 
 	tokenHash := ss.hash(token)

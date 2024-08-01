@@ -73,6 +73,7 @@ func main() {
 
 	mux.Get("/signin", user.SignInHandler)
 	mux.Post("/signin", user.ProcessSignInHandler)
+	mux.Post("/signout", user.ProcessSignOutHandler)
 
 	mux.Get("/users/me", user.CurrentUser)
 	mux.NotFound(func(w http.ResponseWriter, r *http.Request) { http.Error(w, "Page not found", http.StatusNotFound) })
