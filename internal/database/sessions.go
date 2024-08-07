@@ -81,24 +81,20 @@ func (ss *SessionStore) UserLookup(token string) (*User, error) {
 	tokenHash := ss.hash(token)
 
 	// 2. Use the hash to Query the db for the session
+	// PS: In SQL, the order of tables in an inner join does not affect the result of the query, meaning that whether you start with the users table or the sessions table does not change the outcome.
 	var user User
 	row := ss.DB.QueryRow(`
-			SELECT user_id 
-			FROM sessions 
-			WHERE token_hash = $1`, tokenHash)
-	err := row.Scan(&user.ID)
+			SELECT users.id,
+				users.email,
+				users.password_hash
+			FROM sessions
+				JOIN users ON users.id = sessions.user_id
+			WHERE sessions.token_hash = $1`, tokenHash) // WHERE is for filtering
+	err := row.Scan(&user.ID, &user.Email, &user.PasswordHash)
 	if err != nil {
 		return nil, fmt.Errorf("user lookup: %w", err)
 	}
-	// 3. Use the userID from the session to query the db for the user
-	row = ss.DB.QueryRow(`
-			SELECT  email, password_hash
-			FROM users WHERE id = $1`, user.ID)
-	err = row.Scan(&user.Email, &user.PasswordHash)
-	if err != nil {
-		return nil, fmt.Errorf("user lookup: %w", err)
-	}
-	// 4. Return the user
+	// 3. Return the user
 	return &user, nil
 }
 
