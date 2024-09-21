@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	_ "github.com/jackc/pgx/v4/stdlib" // PostgreSQL driver
+	"github.com/pressly/goose/v3"
 )
 
 type PostgresConfig struct {
@@ -44,4 +45,16 @@ func Open(cfg PostgresConfig) (*sql.DB, error) {
 		return nil, fmt.Errorf("open: %w", err)
 	}
 	return db, nil
+}
+
+// this is similar to running from command line
+// goose postgres "host=localhost port=5432 user=xyz dbname=abc password=ppp sslmode=disable" up
+func Migrate(db *sql.DB, dir string) error {
+	if err := goose.SetDialect("postgres"); err != nil {
+		return fmt.Errorf("migrate: %w", err)
+	}
+	if err := goose.Up(db, dir); err != nil {
+		return fmt.Errorf("migrate: %w", err)
+	}
+	return nil
 }

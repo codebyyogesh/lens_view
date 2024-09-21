@@ -44,6 +44,11 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
+	// db migrations with Goose
+	err = database.Migrate(db, "internal/database/migrations")
+	if err != nil {
+		panic(err)
+	}
 	// setup the db(db acts here as a model of mvc pattern) store
 	userStore := database.UserStore{
 		DB: db,
