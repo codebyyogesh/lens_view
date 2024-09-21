@@ -7,6 +7,7 @@ import (
 	"github.com/codebyyogesh/lens_view/assets"
 	"github.com/codebyyogesh/lens_view/internal/actions"
 	"github.com/codebyyogesh/lens_view/internal/database"
+	"github.com/codebyyogesh/lens_view/internal/database/migrations"
 	"github.com/codebyyogesh/lens_view/internal/views"
 
 	"github.com/gorilla/csrf"
@@ -45,7 +46,7 @@ func main() {
 	}
 	defer db.Close()
 	// db migrations with Goose
-	err = database.Migrate(db, "internal/database/migrations")
+	err = database.MigrateFS(db, migrations.FS, ".")
 	if err != nil {
 		panic(err)
 	}
